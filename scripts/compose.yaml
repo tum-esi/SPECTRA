@@ -1,0 +1,49 @@
+# Without this, the project name would default to this file's folder ("scripts"),
+# tagging images scripts-golang / scripts-rust.
+name: spectra
+
+# All paths below are relative to this file's directory (scripts/), which is what
+# compose uses as the project directory unless --project-directory says otherwise.
+services:
+
+  rust:
+    build:
+      context: ..
+      dockerfile: scripts/rust_dockerfile/Dockerfile
+    container_name: spectra_rust
+    working_dir: /workspace
+    # 6-core machines (e.g. the Jetson) need BENCH_CPUSET=0-5.
+    cpuset: "${BENCH_CPUSET:-0-7}"
+    volumes:
+      - ../:/workspace
+    environment:
+      CARGO_TARGET_DIR: /workspace/src/supernova/target/shared
+      BENCHMARK_GPU_QUERY: ${BENCHMARK_GPU_QUERY:-}
+      # CPU baseline. The CUDA base image sets NVIDIA_VISIBLE_DEVICES=all, and
+      # a daemon with default-runtime nvidia then hands every container the
+      # GPU; the binary (CUDA compiled in whenever nvcc exists) would use it.
+      # Hide it from the runtime and from CUDA so every MSM falls back to CPU.
+      NVIDIA_VISIBLE_DEVICES: void
+      CUDA_VISIBLE_DEVICES: ""
+    init: true
+    stdin_open: true
+    tty: true
+
+  rust-gpu:
+    build:
+      context: ..
+      dockerfile: scripts/rust_dockerfile/Dockerfile
+    container_name: spectra_rust_gpu
+    working_dir: /workspace
+    # 6-core machines (e.g. the Jetson) need BENCH_CPUSET=0-5.
+    cpuset: "${BENCH_CPUSET:-0-7}"
+    volumes:
+      - ../:/workspace
+    environment:
+      CARGO_TARGET_DIR: /workspace/src/supernova/target/shared
+      BENCHMARK_GPU_QUERY: ${BENCHMARK_GPU_QUERY:-}
+    gpus: all
+    init: true
+    stdin_open: true
+    tty: true
+

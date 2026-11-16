@@ -1,0 +1,32 @@
+[package]
+name = "supernova"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bellpepper-core = { version = "0.4.0", default-features = false }
+bellpepper = "0.4.1"
+ff = { version = "0.13.0", features = ["derive"] }
+neptune = { version = "13.0.0", default-features = false }
+generic-array = "1.0.0"
+npyz = "0.9.1"
+arecibo = { path = "third-party/arecibo" }
+ndarray-npy = "0.10.0"
+ndarray = "0.17.2"
+bincode = "1.3"
+indicatif = "0.17"
+pprof = { version = "0.15", features = ["prost-codec", "framehop-unwinder"] }
+
+[dev-dependencies]
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+
+[features]
+mem-profile = []
+
+[profile.profiling]
+inherits = "release"
+debug = 1
+strip = false
+
+[patch.crates-io]
+pasta-msm = { path = "third-party/pasta-msm" }
